@@ -1,3 +1,4 @@
+#Aldrei Chua
 """
 Title: Alternate simpler method for directly extracting points
 Author: GeeksForGeeks
@@ -33,14 +34,14 @@ def canny_edge(image):
 
     gray_img = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)  # Convert the video into grayscale
     gray_img = cv2.GaussianBlur(gray_img, (5, 5), 0)  # Blur the image
-    edges = cv2.Canny(gray_img, 190, 225)  # Detect edges that are very dark
+    edges = cv2.Canny(gray_img, 50, 200, 5, L2gradient=True)  # Detect edges that are very dark
     lines = cv2.HoughLinesP(
         edges,  # Input edge image
         1,  # Distance resolution in pixels
         np.pi/180,  # Angle resolution in radians
         threshold=5,  # Min number of votes for valid line
         minLineLength=20,  # Min allowed length of line
-        maxLineGap=30  # Max allowed gap between line for joining them
+        maxLineGap=10  # Max allowed gap between line for joining them
     )
 
     # Create arrays to separate the lines into two main parallel lines
