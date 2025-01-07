@@ -71,9 +71,7 @@ def canny_edge(image):
             # Checks the line has a similar slope and y-intercept to the reference line
             if ((b <= 0 and b1 <= 0 and b*1.25 <= b1 <= b*0.75) or (b >= 0 and b1 >= 0 and b*0.75 <= b1 <= b*1.25) or b-20 <= b1 <= b+20) and (np.arctan(m)-(np.pi/18) <= np.arctan(m1) <= np.arctan(m)+(np.pi/18)):
                 first_line.append([m1, b1, x3])  # Puts slope and intercept in first array if both are similar
-            elif (np.pi*25/18 <= abs(np.arctan(m)) <= np.pi*29/18 or np.pi*7/18 <= abs(np.arctan(m)) <= np.pi*11/18) and (np.pi*25/18 <= abs(np.arctan(m1)) <= np.pi*29/18 or np.pi*7/18 <= abs(np.arctan(m1)) <= np.pi*11/18) and abs(x3)*0.8 <= abs(x1) <= abs(x3)*1.2:
-                first_line.append([m1, b1, x3])  # Puts slope, intercept, and x-coordinate if the line is near-vertical and close to the reference line
-            elif np.arctan(m)-(np.pi/18) <= np.arctan(m1) <= np.arctan(m)+(np.pi/18):
+            elif np.arctan(m)-(np.pi/18) <= np.arctan(m1) <= np.arctan(m)+(np.pi/18) or abs(m*0.7) <= abs(m1) <= abs(m*1.3):
                 second_line.append([m1, b1, x3])  # Puts slope and intercept in second array if only slope is similar
 
             if not first_line or not second_line:
