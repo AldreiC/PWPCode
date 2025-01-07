@@ -56,7 +56,7 @@ def canny_edge(image):
         else:
             m = 10000
             b = y1 - x1 * 10000
-        first_line.append([m, b, x1])  # Put the slope and y-intercept in the first_line array
+        first_line.append([m, b])  # Put the slope and y-intercept in the first_line array
 
         for points in lines[1:]:
             # Use the other lines in the list
@@ -70,44 +70,28 @@ def canny_edge(image):
 
             # Checks the line has a similar slope and y-intercept to the reference line
             if ((b <= 0 and b1 <= 0 and b*1.25 <= b1 <= b*0.75) or (b >= 0 and b1 >= 0 and b*0.75 <= b1 <= b*1.25) or b-20 <= b1 <= b+20) and (np.arctan(m)-(np.pi/18) <= np.arctan(m1) <= np.arctan(m)+(np.pi/18)):
-                first_line.append([m1, b1, x3])  # Puts slope and intercept in first array if both are similar
-            elif np.arctan(m)-(np.pi/18) <= np.arctan(m1) <= np.arctan(m)+(np.pi/18) or abs(m*0.7) <= abs(m1) <= abs(m*1.3):
-                second_line.append([m1, b1, x3])  # Puts slope and intercept in second array if only slope is similar
-
-            if not first_line or not second_line:
-                continue  # If a line is not detected try again
+                first_line.append([m1, b1])  # Puts slope and intercept in first array if both are similar
+            elif (m*0.75 <= (m1*-1) <= m*1.5) or (m*1.5 <= (m1*-1) <= m*0.75):
+                second_line.append([m1, b1])  # Puts slope and intercept in second array if slope is opposite
 
         # Create arrays that hold the slope and intercept for the two parallel lines
-        line1 = [0, 0, 0]
-        line2 = [0, 0, 0]
+        line1 = [0, 0]
+        line2 = [0, 0]
 
         # Find the average slope and intercept of the lines in the first array
         for line in first_line:
             line1[0] += line[0]/len(first_line)
             line1[1] += line[1]/len(first_line)
-            line1[2] += line[2]/len(first_line)
 
         # Find the average slope and intercept of the lines in the second array
         for other_line in second_line:
             line2[0] += other_line[0]/len(second_line)
             line2[1] += other_line[1]/len(second_line)
-            line2[2] += other_line[2]/len(second_line)
 
         # Draw the two parallel lines based on the average slopes and intercepts calculated
-        # If the slope is almost vertical, draw the line based on the x-coordinate
-        if np.pi*25/18 <= abs(np.arctan(line1[0])) <= np.pi*29/18 or np.pi*7/18 <= abs(np.arctan(line1[0])) <= np.pi*11/18:
-            pt1, pt2 = (int(line1[2]), 0), (int(line1[2]), 480)
-            cv2.line(image, (int(line1[2]), 0), (int(line1[2]), 480), (255, 0, 0), 2)
-        else:
-            pt1, pt2 = (0, int(line1[1])), (640, int(640 * line1[0] + line1[1]))
-
+        pt1, pt2 = (0, int(line1[1])), (640, int(640 * line1[0] + line1[1]))
+        pt3, pt4 = (0, int(line2[1])), (640, int(640 * line2[0] + line2[1]))
         cv2.line(image, pt1, pt2, (255, 0, 0), 2)
-
-        if np.pi*25/18 <= abs(np.arctan(line2[0])) <= np.pi*29/18 or np.pi*7/18 <= abs(np.arctan(line2[0])) <= np.pi*11/18:
-            pt3, pt4 = (int(line2[2]), 0), (int(line2[2]), 480)
-        else:
-            pt3, pt4 = (0, int(line2[1])), (640, int(640 * line2[0] + line2[1]))
-
         cv2.line(image, pt3, pt4, (255, 0, 0), 2)
 
         # Draw the centerline based on the averages of the endpoints of the two lines
