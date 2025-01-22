@@ -12,7 +12,7 @@ def detect_circle(image):
     # Create and apply a mask to hide distracting elements
     mask = np.zeros(img.shape[:2], np.uint8)
     mask[150:525, 300:700] = 255
-    #gray_img = cv2.bitwise_and(gray_img, gray_img, mask=mask)
+    gray_img = cv2.bitwise_and(gray_img, gray_img, mask=mask)
 
     # Use Canny edge detection to find strong borders and find contours based on the edges
     edges = cv2.Canny(gray_img, 50, 150)
@@ -28,34 +28,26 @@ def detect_circle(image):
         radius = int(radius)
 
         # Filters out dots and extremely large circles
-        if radius >= 50:
+        if 100 <= radius <= 500:
             circles.append([center, radius, 0])  # Add the center, radius, and a measure of similarity to other circles
 
     # Increments the similarity measure when the circle finds another circle with a similar center
     for circle in circles:
         for other_circle in circles:
-            if (abs(circle[0][0] - other_circle[0][0]) <= 10 or abs(circle[0][1] - other_circle[0][1]) <= 10) and circle != other_circle:
+            if abs(circle[0][0] - other_circle[0][0]) <= 10 or abs(circle[0][1] - other_circle[0][1]) <= 10:
                 circle[2] += 1
 
     circles.sort(key=lambda x: x[2], reverse=True)  # Sorts the circles list to put the most popular circles first
-    circle_x = 0
-    circle_y = 0
-    circle_r = 0
-    circle_count = 0
 
     for circle in circles:
         # Only use the circles with the highest similarity measure
         if circle[2] < circles[0][2]:
             break
-        circle_count += 1  # Counts number of circles
-        circle_x += circle[0][0]
-        circle_y += circle[0][1]
-        circle_r += circle[1]
 
-    # Assign the average of the circles' measurements to avg_circle (accounts for duplication from for loop)
-    avg_circle[0][0] += (circle_x / circle_count)
-    avg_circle[0][1] += (circle_y / circle_count)
-    avg_circle[1] += (circle_r / circle_count)
+        # Assign the average of the circles' measurements to avg_circle (accounts for duplication from for loop)
+        avg_circle[0][0] += (circle[0][0] / (circle[2]-2))
+        avg_circle[0][1] += (circle[0][1] / (circle[2]-2))
+        avg_circle[1] += (circle[1] / (circle[2]-2))
 
     # Draw the average circle and its center point
     cv2.circle(image, tuple([int(avg_circle[0][0]), int(avg_circle[0][1])]), int(avg_circle[1]), (0, 255, 0), 3)
